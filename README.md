@@ -19,6 +19,12 @@ This repo will contain a ROS package and depancies to detect markers for the Pan
 
 ![Gate guider (4)](https://user-images.githubusercontent.com/90921913/218108712-39d3538a-af41-429b-a17b-d92df176a49f.png) 
 
+Preconditions
+- ASV is more than 6 ft away from the markers, but close enough to classify and identify distance.
+- Sensors are working and readings are valid
+
+Post Conditions
+- The GPS coordinate for the mid-point between the red and green marker has been identified.
 
 ### Object Detection
 
@@ -33,3 +39,7 @@ We trained our model to recognize the following objects:
 - white marker
 - red marker
 - green marker
+
+## Notes
+
+This method of navigation does not have a crash prevention system if another object or vehicle were to obstruct the robot's path. We should implement some sort of interput using an ultrasonic sensor that halts movement if something is detected close in front of the robot.  
