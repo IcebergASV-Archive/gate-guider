@@ -2,7 +2,13 @@
 
 # gate-guider
 
-This repo will contain a ROS package and depancies to detect markers for the Panama Canal task and and output a GPS coordinate between the markers. 
+This repo will contain a ROS package and depancies to detect markers for the Panama Canal task and and output a GPS coordinate between the markers. The Panama Canal task requires that the ASV is autonomous at least 6 ft in front of the first set of gates. The ASV must then pass through the two sets of gates autonomously to successfully complete the task.
+
+### Task Diagram
+
+<img width="250" alt="name" src="https://user-images.githubusercontent.com/90921913/218113264-a1950a63-6b9e-47cd-97b8-9a09e15f3a64.png">
+
+### Our Approach to Navgigating Through a Gate
 
 <img width="250" alt="Gate guider (2)" src="https://user-images.githubusercontent.com/90921913/218099834-93d54166-97d3-4dd4-9d11-b6267585c7c8.png">
 
