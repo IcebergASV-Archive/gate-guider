@@ -40,6 +40,8 @@ We trained our model to recognize the following objects:
 - red marker
 - green marker
 
-## Notes
+## Design Considerations and Notes
+
+This should be developed with other tasks in mind. We want to be able to resuse most of this to accomplish the speed run task. 
 
 This method of navigation does not have a crash prevention system if another object or vehicle were to obstruct the robot's path. We should implement some sort of interput using an ultrasonic sensor that halts movement if something is detected close in front of the robot.  
