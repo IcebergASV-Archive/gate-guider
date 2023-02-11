@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<robot name="rect_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="chassisHeight" value="0.1"/>
+  <xacro:property name="chassisLength" value="0.4"/>
+  <xacro:property name="chassisWidth" value="0.2"/>
+  <xacro:property name="chassisMass" value="50"/>
+
+  <xacro:property name="wheelWidth" value="0.05"/>
+  <xacro:property name="h" value="0.05"/>
+  <xacro:property name="wheelRadius" value="0.1"/>
+  <xacro:property name="r" value="0.1"/>
+  <xacro:property name="wheelPos" value="0.25"/>
+  <xacro:property name="wheelMass" value="5"/>
+  <xacro:property name="m" value="5"/>
+
+  <xacro:property name="casterRadius" value="0.05"/>
+  <xacro:property name="casterMass" value="5"/>
+
+  <xacro:property name="cameraSize" value="0.05"/>
+  <xacro:property name="cameraMass" value="0.1"/>
+  
+
+
+  <xacro:include filename="$(find rect_bot_description_pkg)/urdf/rect_bot.gazebo" />
+  <xacro:include filename="$(find rect_bot_description_pkg)/urdf/materials.xacro" />
+
+
+
+
+    <link name="chassis">
+        <inertial>
+            <mass value="${chassisMass}" />
+            <origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
+            <inertia ixx="1.5417" ixy="0" ixz="0" iyy="3.467" iyz="0" izz="4.742" />
+        </inertial>
+
+        <collision>
+        <origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
+            <geometry>
+                <box size="${chassisLength} ${chassisWidth} ${chassisHeight}"/> 
+            </geometry>
+        </collision>
+
+        <visual>
+          <origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
+          <geometry>
+            <box size="${chassisLength} ${chassisWidth} ${chassisHeight}"/>
+          </geometry>
+          <material name="orange">
+          </material>
+        </visual>
+    </link>
+
+  
+
+  <!-- Adding a Camera -->
+  <joint name="joint_camera_base" type="fixed">
+    <parent link="chassis"/>
+    <child link="camera" />
+    <origin xyz="${chassisLength/2-cameraSize/2} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0" />
+  </joint>
+
+  <link name="camera">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <inertial>
+      <mass value="${cameraMass}" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.000252666666667" ixy="0" ixz="0" iyy="0.000252666666667" iyz="0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <!-- Adding a Laser Scanner -->
+  <joint name="joint_hokuyo" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="${chassisLength/2-0.005} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0" />
+    <!--origin xyz=".15 0 .1" rpy="0 0 0"/-->
+    <parent link="chassis"/>
+    <child link="hokuyo"/>
+  </joint>
+
+  <!-- Hokuyo Laser -->
+  <link name="hokuyo">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://skbot_description/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+
+
+  
+</robot>

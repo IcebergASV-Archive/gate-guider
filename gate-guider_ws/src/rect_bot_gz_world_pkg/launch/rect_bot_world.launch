@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch> 
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find rect_bot_gz_world_pkg)/worlds/rect_bot.world"/>
+    <arg name="gui" value="true"/>
+
+  </include>
+
+
+
+</launch>
