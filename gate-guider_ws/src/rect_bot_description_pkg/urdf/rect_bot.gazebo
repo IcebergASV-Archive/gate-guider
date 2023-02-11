@@ -93,7 +93,7 @@
         </noise>
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>/skbot/laser/scan</topicName>
+        <topicName>/rect_bot/laser/scan</topicName>
         <frameName>hokuyo</frameName>
       </plugin>
     </sensor>

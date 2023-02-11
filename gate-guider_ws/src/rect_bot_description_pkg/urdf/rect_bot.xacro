@@ -104,7 +104,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://skbot_description/meshes/hokuyo.dae"/>
+        <mesh filename="package://rect_bot_description_pkg/meshes/hokuyo.dae"/>
       </geometry>
     </visual>
 
