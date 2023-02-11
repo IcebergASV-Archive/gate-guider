@@ -45,3 +45,32 @@ We trained our model to recognize the following objects:
 This should be developed with other tasks in mind. We want to be able to resuse most of this to accomplish the speed run task. 
 
 This method of navigation does not have a crash prevention system if another object or vehicle were to obstruct the robot's path. We should implement some sort of interput using an ultrasonic sensor that halts movement if something is detected close in front of the robot.  
+
+
+
+## Dataset Creation for You Only Look Once (YOLO)
+
+1. Collect the images that you want to include in your dataset 
+2. Go to the Computer Vision Annotation Tool (CVAT) website https://www.cvat.ai/ and select the try for free option in the top menu and create an account. Link: https://www.cvat.ai/ 
+3. Once, you have entered create a new project. Use a descriptive name for the project and in the constructor section click add labels. Labels are the  names of the objects that you will be annotating. After you are finished select Submit and Open. **Note: If more labels want to be added afterwards it is possible.**
+![Screenshot from 2023-02-11 13-56-22](https://user-images.githubusercontent.com/92492748/218272160-e0644138-3512-49bd-9d3e-ee2578bcd6e2.png)
+4. Create a new task. Name the task and upload the images that you would like to annotate. **Note: Before you click submit and continue be aware that images can't be uploaded anymore. A new project a task must be created.** After click submit and continue.
+![CreateTask](https://user-images.githubusercontent.com/92492748/218272508-407e444b-0430-4ed6-9503-e93212909beb.png)
+5. In the left hand menu search for a square button and start annotating the objects you want to annotate. If you want to annotate a different object a drop down list will appear with the other object labels you created. **Click the save button after completing the annotations of one picture.**
+6. To move to the next picture select go next.
+7. After all the images are annotated. Go back to task and select actions. This will open a drop down list and select export task dataset. The format that you should select is Pascal VOC 1.1. Add a custom name to the zip file and click ok. The first time you run this it will take a couple minutes. The zip file should be available in your downloads.
+![ExportTask](https://user-images.githubusercontent.com/92492748/218272866-1e55c90d-7caf-40a4-9cc7-58c7fc2c525b.png)
+8. After extracting the zip file there are two folders: Annotations and ImageSets. In the Anotations folders there is an xml file that corresponds every image annotated. This files will be used to train the data. 
+![ZipFileFolderBreakDown](https://user-images.githubusercontent.com/92492748/218273002-60398ab4-12a6-4c2f-a2c6-9764931c44c6.png)
+
+
+## Computer Vision Annotation Tool (CVAT)
+### CVAT Description
+CVAT allows you to annotate the images for your data set
+
+
+
+## Resources
+The following video was used to create the Dataset: https://www.youtube.com/watch?v=OMgQ2JzOAWA
+This video explains how to use CVAT to annotate images and how to export the annotations into your computer.
+
