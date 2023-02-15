@@ -6,56 +6,54 @@
 
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/skbot</robotNamespace>
+      <robotNamespace>/rect_bot</robotNamespace>
     </plugin>
   </gazebo>
 
-    <gazebo>
-    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
-      <alwaysOn>true</alwaysOn>
-      <updateRate>100</updateRate>
-      <leftJoint>joint_left_wheel_hinge</leftJoint>
-      <rightJoint>joint_right_wheel_hinge</rightJoint>
-      <wheelSeparation>${chassisWidth+wheelWidth}</wheelSeparation>
-      <wheelDiameter>${2*wheelRadius}</wheelDiameter>
-      <torque>20</torque>
-      <commandTopic>/skbot/cmd_vel</commandTopic>
-      <odometryTopic>/skbot/odom</odometryTopic>
-      <odometryFrame>/skbot/odom</odometryFrame>
-      <robotBaseFrame>chassis</robotBaseFrame>
-      <robotBaseFrame>footprint</robotBaseFrame>
-    </plugin>
-  </gazebo>
 
-    <gazebo reference="camera">
-    <material>Gazebo/Blue</material>
-    <sensor type="camera" name="camera1">
-      <update_rate>30.0</update_rate>
-      <camera name="head">
-        <horizontal_fov>1.3962634</horizontal_fov>
+  <gazebo reference="front_realsense">
+    <turnGravityOff>true</turnGravityOff>
+    <sensor type="depth" name="front_realsense_depth">
+      <update_rate>30</update_rate>
+      <camera>
+        <!--75x65 degree FOV for the depth sensor -->
+        <horizontal_fov>1.5184351666666667</horizontal_fov>
+        <vertical_fov>1.0122901111111111</vertical_fov>
+
         <image>
-          <width>320</width>
-          <height>240</height>
-          <format>R8G8B8</format>
+          <width>640</width>
+          <height>480</height>
+          <format>RGB8</format>
         </image>
         <clip>
-          <near>0.02</near>
-          <far>300</far>
+          <!--give the color sensor a maximum range of 50m so that the simulation renders nicely -->
+          <near>0.01</near>
+          <far>50.0</far>
         </clip>
       </camera>
-      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+      <plugin name="kinect_controller" filename="libgazebo_ros_openni_kinect.so">
+        <baseline>0.2</baseline>
         <alwaysOn>true</alwaysOn>
-        <updateRate>0.0</updateRate>
-        <cameraName>/skbot/camera1</cameraName>
-        <imageTopicName>image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <frameName>camera</frameName>
-        <hackBaseline>0.07</hackBaseline>
-        <distortionK1>0.0</distortionK1>
-        <distortionK2>0.0</distortionK2>
-        <distortionK3>0.0</distortionK3>
-        <distortionT1>0.0</distortionT1>
-        <distortionT2>0.0</distortionT2>
+        <updateRate>30</updateRate>
+        <cameraName>realsense</cameraName>
+        <imageTopicName>color/image_raw</imageTopicName>
+        <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
+        <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
+        <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
+        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+        <frameName>front_realsense_gazebo</frameName>
+        <pointCloudCutoff>0.105</pointCloudCutoff>
+        <pointCloudCutoffMax>8.0</pointCloudCutoffMax>
+        <distortionK1>0.00000001</distortionK1>
+        <distortionK2>0.00000001</distortionK2>
+        <distortionK3>0.00000001</distortionK3>
+        <distortionT1>0.00000001</distortionT1>
+        <distortionT2>0.00000001</distortionT2>
+        <CxPrime>0</CxPrime>
+        <Cx>0</Cx>
+        <Cy>0</Cy>
+        <focalLength>0</focalLength>
+        <hackBaseline>0</hackBaseline>
       </plugin>
     </sensor>
   </gazebo>

@@ -55,33 +55,7 @@
 
   
 
-  <!-- Adding a Camera -->
-  <joint name="joint_camera_base" type="fixed">
-    <parent link="chassis"/>
-    <child link="camera" />
-    <origin xyz="${chassisLength/2-cameraSize/2} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0" />
-  </joint>
 
-  <link name="camera">
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
-      </geometry>
-    </collision>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
-      </geometry>
-      <material name="blue"/>
-    </visual>
-    <inertial>
-      <mass value="${cameraMass}" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.000252666666667" ixy="0" ixz="0" iyy="0.000252666666667" iyz="0" izz="0.0005"/>
-    </inertial>
-  </link>
 
   <!-- Adding a Laser Scanner -->
   <joint name="joint_hokuyo" type="fixed">
@@ -115,7 +89,45 @@
     </inertial>
   </link>
 
+  <link name="front_realsense" />
 
-
+  <!--
+    The gazebo plugin aligns the depth data with the Z axis, with X=left and Y=up
+    ROS expects the depth data along the X axis, with Y=left and Z=up
+    This link only exists to give the gazebo plugin the correctly-oriented frame
+    -->
   
+  <link name="front_realsense_gazebo" />
+
+  <joint name="front_realsense_gazebo_joint" type="fixed">
+    <parent link="front_realsense"/>
+    <child link="front_realsense_gazebo"/>
+    <origin xyz="${chassisLength/2} 0 ${chassisHeight+wheelRadius+0.1}" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
+  </joint>
+
+
+
+  <link name="front_realsense_lens">
+    <visual>
+      <origin xyz="0.02 0 0" rpy="${pi/2} 0 ${pi/2}" />
+      <geometry>
+        <mesh filename="package://realsense2_description/meshes/d435.dae" />
+      </geometry>
+      <material name="white" />
+    </visual>
+  </link>
+
+  <joint type="fixed" name="front_realsense_lens_joint">
+    <!-- Offset the camera 2cm backwards and 1cm up-->
+    <origin xyz="${chassisLength/2-0.02} 0 ${chassisHeight+wheelRadius+0.11}" rpy="0 0 0" />
+    <parent link="chassis" />
+    <child link="front_realsense_lens" />
+  </joint>
+  <joint type="fixed" name="front_realsense_joint">
+    <origin xyz="${chassisLength/2+0.025} 0 ${chassisHeight+wheelRadius+0.1}" rpy="0 0 0" />
+    <parent link="front_realsense_lens" />
+    <child link="front_realsense" />
+  </joint>
+
+  -->
 </robot>
