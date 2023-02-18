@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<robot name="rect_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="chassisHeight" value="0.1"/>
+  <xacro:property name="chassisLength" value="0.4"/>
+  <xacro:property name="chassisWidth" value="0.2"/>
+  <xacro:property name="chassisMass" value="50"/>
+
+  <xacro:property name="wheelWidth" value="0.05"/>
+  <xacro:property name="h" value="0.05"/>
+  <xacro:property name="wheelRadius" value="0.1"/>
+  <xacro:property name="r" value="0.1"/>
+  <xacro:property name="wheelPos" value="0.25"/>
+  <xacro:property name="wheelMass" value="5"/>
+  <xacro:property name="m" value="5"/>
+
+  <xacro:property name="casterRadius" value="0.05"/>
+  <xacro:property name="casterMass" value="5"/>
+
+  <xacro:property name="cameraSize" value="0.05"/>
+  <xacro:property name="cameraMass" value="0.1"/>
+  
+
+
+  <xacro:include filename="$(find rect_bot_description_pkg)/urdf/rect_bot.gazebo" />
+  <xacro:include filename="$(find rect_bot_description_pkg)/urdf/materials.xacro" />
+
+
+
+
+    <link name="chassis">
+        <inertial>
+            <mass value="${chassisMass}" />
+            <origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
+            <inertia ixx="1.5417" ixy="0" ixz="0" iyy="3.467" iyz="0" izz="4.742" />
+        </inertial>
+
+        <collision>
+        <origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
+            <geometry>
+                <box size="${chassisLength} ${chassisWidth} ${chassisHeight}"/> 
+            </geometry>
+        </collision>
+
+        <visual>
+          <origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
+          <geometry>
+            <box size="${chassisLength} ${chassisWidth} ${chassisHeight}"/>
+          </geometry>
+          <material name="orange">
+          </material>
+        </visual>
+    </link>
+
+  
+
+
+
+  <!-- Adding a Laser Scanner -->
+  <joint name="joint_hokuyo" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="${chassisLength/2-0.005} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0" />
+    <!--origin xyz=".15 0 .1" rpy="0 0 0"/-->
+    <parent link="chassis"/>
+    <child link="hokuyo"/>
+  </joint>
+
+  <!-- Hokuyo Laser -->
+  <link name="hokuyo">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://rect_bot_description_pkg/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <link name="front_realsense" />
+
+  <!--
+    The gazebo plugin aligns the depth data with the Z axis, with X=left and Y=up
+    ROS expects the depth data along the X axis, with Y=left and Z=up
+    This link only exists to give the gazebo plugin the correctly-oriented frame
+    -->
+  
+  <link name="front_realsense_gazebo" />
+
+  <joint name="front_realsense_gazebo_joint" type="fixed">
+    <parent link="front_realsense"/>
+    <child link="front_realsense_gazebo"/>
+    <origin xyz="${chassisLength/2} 0 ${chassisHeight+wheelRadius+0.1}" rpy="-1.5707963267948966 0 -1.5707963267948966"/>
+  </joint>
+
+
+
+  <link name="front_realsense_lens">
+    <visual>
+      <origin xyz="0.02 0 0" rpy="${pi/2} 0 ${pi/2}" />
+      <geometry>
+        <mesh filename="package://realsense2_description/meshes/d435.dae" />
+      </geometry>
+      <material name="white" />
+    </visual>
+  </link>
+
+  <joint type="fixed" name="front_realsense_lens_joint">
+    <!-- Offset the camera 2cm backwards and 1cm up-->
+    <origin xyz="${chassisLength/2-0.02} 0 ${chassisHeight+wheelRadius+0.11}" rpy="0 0 0" />
+    <parent link="chassis" />
+    <child link="front_realsense_lens" />
+  </joint>
+  <joint type="fixed" name="front_realsense_joint">
+    <origin xyz="${chassisLength/2+0.025} 0 ${chassisHeight+wheelRadius+0.1}" rpy="0 0 0" />
+    <parent link="front_realsense_lens" />
+    <child link="front_realsense" />
+  </joint>
+
+  -->
+</robot>
