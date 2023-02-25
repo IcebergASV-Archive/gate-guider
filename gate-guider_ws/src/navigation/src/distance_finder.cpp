@@ -60,7 +60,7 @@ private:
         }
 
         // calculate the range indexes for the given theta angles
-        int steps = (laser_angle_max * 2) / laser_angle_increment; 
+        float steps = (laser_angle_max * 2) / laser_angle_increment; 
         int index1 = (int)(((prop_msg_.theta_1 + (laser_angle_max - 1.570796327)) / (laser_angle_max*2))* steps);
         int index2 = (int)(((prop_msg_.theta_2 + (laser_angle_max - 1.570796327)) / (laser_angle_max*2))* steps);
 
@@ -74,17 +74,25 @@ private:
 
         int i = 0;
         float closest_pnt = scan_msg.ranges[i];
-        
+        int closest_angle_index = 0;
         for (i = index1; i <= index2; ++i) {
             if (std::isnan(scan_msg.ranges[i])) {
                 continue; //
             }
             if(scan_msg.ranges[i] < closest_pnt){
                 closest_pnt = scan_msg.ranges[i];
+                closest_angle_index = i;
+                
+                
             }
         }
+        ROS_INFO_STREAM("note i is: " << closest_angle_index);
+        ROS_INFO_STREAM("closest_angle/steps" << (closest_angle_index/steps));
+        ROS_INFO_STREAM("steps" << steps);
+        ROS_INFO_STREAM("440/720" << (440/720));
+        ROS_INFO_STREAM("times laer max *2" << (closest_angle_index/steps)*(laser_angle_max*2));
 
-        float closest_angle = laser_angle_min + i * laser_angle_increment;
+        float closest_angle = ((closest_angle_index/steps)*(laser_angle_max*2)) - (laser_angle_max - 1.570796327);
         navigation::Prop closest_prop_msg;
         closest_prop_msg.prop_type = prop_msg_.prop_type;
         closest_prop_msg.theta_1 = prop_msg_.theta_1;
