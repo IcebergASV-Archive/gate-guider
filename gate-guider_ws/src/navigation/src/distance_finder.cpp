@@ -9,8 +9,8 @@ public:
         private_nh_.param<std::string>("prop_topic", prop_topic_, "/prop_angle_range");
         private_nh_.param<std::string>("scan_topic", scan_topic_, "/rect_bot/laser/scan");
         private_nh_.param<double>("max_range", max_range_, 10.0);
-        private_nh_.param<double>("laser_angle_min", laser_angle_min_, -M_PI/2.0);
-        private_nh_.param<double>("laser_angle_max", laser_angle_max_, M_PI/2.0);
+        private_nh_.param<double>("laser_angle_min", laser_angle_min, -M_PI/2.0);
+        private_nh_.param<double>("laser_angle_max", laser_angle_max, M_PI/2.0);
 
         // set up publishers and subscribers
         sub_scan_ = nh_.subscribe(scan_topic_, 1, &LaserScanner::scanCallback, this);
@@ -35,9 +35,9 @@ private:
     std::string prop_topic_;
     std::string scan_topic_;
     double max_range_;
-    double laser_angle_min_;
-    double laser_angle_max_;
-    double laser_angle_increment_;
+    double laser_angle_min;
+    double laser_angle_max;
+    double laser_angle_increment;
     navigation::Prop prop_msg_;
     sensor_msgs::LaserScan scan_msg;
 
@@ -51,7 +51,7 @@ private:
     void scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
         // save the scan message for later use
         scan_msg = *msg;
-        laser_angle_increment_ = scan_msg.angle_increment;
+        laser_angle_increment = scan_msg.angle_increment;
 
         // check if the Prop message is valid
         if (prop_msg_.prop_type.empty() || std::isnan(prop_msg_.theta_1) || std::isnan(prop_msg_.theta_2)) {
@@ -60,8 +60,9 @@ private:
         }
 
         // calculate the range indexes for the given theta angles
-        int index1 = (prop_msg_.theta_1 - laser_angle_min_) / laser_angle_increment_;
-        int index2 = (prop_msg_.theta_2 - laser_angle_min_) / laser_angle_increment_;
+        int steps = (laser_angle_max * 2) / laser_angle_increment; 
+        int index1 = (int)(((prop_msg_.theta_1 + (laser_angle_max - 1.570796327)) / (laser_angle_max*2))* steps);
+        int index2 = (int)(((prop_msg_.theta_2 + (laser_angle_max - 1.570796327)) / (laser_angle_max*2))* steps);
 
         // check that the range indexes are within the range of the scan message
         if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size()) {
@@ -83,7 +84,7 @@ private:
             }
         }
 
-        float closest_angle = laser_angle_min_ + i * laser_angle_increment_;
+        float closest_angle = laser_angle_min + i * laser_angle_increment;
         navigation::Prop closest_prop_msg;
         closest_prop_msg.prop_type = prop_msg_.prop_type;
         closest_prop_msg.theta_1 = prop_msg_.theta_1;

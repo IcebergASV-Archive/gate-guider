@@ -7,8 +7,8 @@ void angle_range_finder() {
     ros::Rate rate(10);
     navigation::Prop msg;
     msg.prop_type = "red_marker";
-    msg.theta_1 = 4;
-    msg.theta_2 = 177;
+    msg.theta_1 = 1.6057;
+    msg.theta_2 = 2.7925;
 
     while (ros::ok()) {
         ROS_INFO_STREAM(msg);
