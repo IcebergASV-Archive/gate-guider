@@ -70,7 +70,7 @@ private:
             return;
         }
 
-        // find the closest point within the given range
+        // find the closest point and angle within the given range
 
         int i = 0;
         float closest_pnt = scan_msg.ranges[i];
@@ -86,13 +86,11 @@ private:
                 
             }
         }
-        ROS_INFO_STREAM("note i is: " << closest_angle_index);
-        ROS_INFO_STREAM("closest_angle/steps" << (closest_angle_index/steps));
-        ROS_INFO_STREAM("steps" << steps);
-        ROS_INFO_STREAM("440/720" << (440/720));
-        ROS_INFO_STREAM("times laer max *2" << (closest_angle_index/steps)*(laser_angle_max*2));
 
+        // convert index to angle
         float closest_angle = ((closest_angle_index/steps)*(laser_angle_max*2)) - (laser_angle_max - 1.570796327);
+
+
         navigation::Prop closest_prop_msg;
         closest_prop_msg.prop_type = prop_msg_.prop_type;
         closest_prop_msg.theta_1 = prop_msg_.theta_1;
