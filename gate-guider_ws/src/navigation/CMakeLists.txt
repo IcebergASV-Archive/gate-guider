@@ -209,5 +209,9 @@ include_directories(
 # catkin_add_nosetests(test)
 
 add_executable(fake_bbox_angles src/fake_bbox_angles.cpp)
-target_link_libraries(talker ${catkin_LIBRARIES})
-add_dependencies(talker beginner_tutorials_generate_messages_cpp)
+target_link_libraries(fake_bbox_angles ${catkin_LIBRARIES})
+add_dependencies(fake_bbox_angles ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(distance_finder src/distance_finder.cpp)
+target_link_libraries(distance_finder ${catkin_LIBRARIES})
+add_dependencies(distance_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})

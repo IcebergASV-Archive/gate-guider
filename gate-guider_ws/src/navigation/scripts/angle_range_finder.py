@@ -13,8 +13,8 @@ def angle_range_finder():
     rate = rospy.Rate(10) #10Hz
     msg = Prop()
     msg.prop_type = "red_marker"
-    msg.theta_1 = 177
-    msg.theta_2 = 4
+    msg.theta_1 = 4
+    msg.theta_2 = 177
 
     while not rospy.is_shutdown():
        rospy.loginfo(msg)
