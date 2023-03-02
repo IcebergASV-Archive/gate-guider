@@ -6,8 +6,8 @@ void fake_robot_coords() {
     ros::Publisher pub = nh.advertise<navigation::SimpleGPS>("/rectbot_coords", 10);
     ros::Rate rate(10);
     navigation::SimpleGPS msg;
-    msg.latitude = 37.7749; // Example latitude value
-    msg.longitude = -122.4194; // Example longitude value
+    msg.latitude = 40.0; // Example latitude value
+    msg.longitude = -120; // Example longitude value
     msg.altitude = 50.0; // Example altitude value
 
     while (ros::ok()) {
@@ -17,7 +17,7 @@ void fake_robot_coords() {
     }
 }
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "angle_range_finder_node");
+    ros::init(argc, argv, "fake_robot_coords");
     try {
         fake_robot_coords();
     }

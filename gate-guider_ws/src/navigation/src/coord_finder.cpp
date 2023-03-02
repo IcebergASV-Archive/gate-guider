@@ -9,16 +9,11 @@ class PropLocator {
 public:
     PropLocator()
     {
+        // Set up subscribers and publishers
+        gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &PropLocator::gpsCallback, this);
+        prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &PropLocator::propCallback, this);
+        prop_pub_ = nh_.advertise<navigation::Prop>("/prop_coordinates", 1);
         
-        // get ROS parameters
-        private_nh_.param<std::string>("prop_topic", prop_topic_, "/prop_closest_point");
-        private_nh_.param<std::string>("scan_topic", gps_topic_, "/global_position/local");
-
-
-        // set up publishers and subscribers
-        sub_scan_ = nh_.subscribe(gps_topic_, 1, &PropLocator::gpsCallback, this);
-        sub_prop_ = nh_.subscribe(prop_topic_, 1, &PropLocator::propCallback, this);
-        pub_prop_closest_ = nh_.advertise<navigation::Prop>("/prop_closest_point", 1);
     }
 
     void spin() {
@@ -30,59 +25,46 @@ public:
     }
 
 private:
-    ros::NodeHandle nh_;
-    ros::NodeHandle private_nh_;
-    ros::Subscriber sub_scan_;
-    ros::Subscriber sub_prop_;
-    ros::Publisher pub_prop_closest_;
-    std::string prop_topic_;
-    std::string gps_topic_;
-    navigation::Prop prop_msg_;
-    
-    navigation::SimpleGPS gps_msg_;
-
-
-    void propCallback(const navigation::Prop::ConstPtr& msg) {
-        // save the Prop message for later use
-        prop_msg_ = *msg;
-        ROS_INFO_STREAM("Received Prop message with closest_pnt_dist=" << prop_msg_.closest_pnt_dist
-            << " and closest_pnt_angle=" << prop_msg_.closest_pnt_angle);
+    // Callback for the /global_position/global topic
+    void gpsCallback(const navigation::SimpleGPS::ConstPtr& msg)
+    {
+        robot_lat_ = msg->latitude;
+        robot_lon_ = msg->longitude;
+        robot_alt_ = msg->altitude;
     }
 
-    void gpsCallback(navigation::SimpleGPS::ConstPtr& msg) {
-        // save the scan message for later use
-        gps_msg_ = *msg;
-
-        // check if the Prop message is valid
-        if (prop_msg_.prop_type.empty() || std::isnan(prop_msg_.theta_1) || std::isnan(prop_msg_.theta_2)) {
-            ROS_WARN("Invalid Prop message received");
-            return;
-        }
-
-        float robot_lat = gps_msg_.latitude;
-        float robot_lon  = gps_msg_.longitude;
-
-        float prop_dist = prop_msg_.closest_pnt_dist;
-        float prop_angle = prop_msg_.closest_pnt_angle;
-
-        float prop_lat = robot_lat + (prop_dist * cos(prop_angle)) / 111111.0; // 1 degree of latitude = 111111 meters
-        float prop_lon = robot_lon + (prop_dist * sin(prop_angle)) / (111111.0 * cos(robot_lat));
-        float prop_alt = gps_msg_.altitude;
-
-        // Publish the GPS coordinates of the prop
-        navigation::Prop complete_prop_msg;
-        complete_prop_msg.prop_type = prop_msg_.prop_type;
-        complete_prop_msg.theta_1 = prop_msg_.theta_1;
-        complete_prop_msg.theta_2 = prop_msg_.theta_2;
-        complete_prop_msg.closest_pnt_dist = prop_msg_.closest_pnt_dist;
-        complete_prop_msg.closest_pnt_angle = prop_msg_.closest_pnt_angle;
-        complete_prop_msg.prop_coords.latitude = prop_lat;
-        complete_prop_msg.prop_coords.longitude = prop_lon;
-        complete_prop_msg.prop_coords.altitude = prop_alt;
+    // Callback for the /prop_closest_point topic
+    void propCallback(const navigation::Prop::ConstPtr& msg)
+    {
+        // Calculate the GPS coordinates of the prop
+        float dist = msg->closest_pnt_dist;
+        float angle = msg->closest_pnt_angle;
+        float prop_lat = robot_lat_ + (dist * cos(angle)) / 111111.0; // 1 degree of latitude = 111111 meters
+        float prop_lon = robot_lon_ + (dist * sin(angle)) / (111111.0 * cos(robot_lat_));
+        float prop_alt = robot_alt_;
         
-        pub_prop_closest_.publish(complete_prop_msg);
+        // Create and publish the Prop message with the prop coordinates
+        navigation::Prop prop_msg;
+        prop_msg.prop_type = msg->prop_type;
+        prop_msg.theta_1 = msg->theta_1;
+        prop_msg.theta_2 = msg->theta_2;
+        prop_msg.closest_pnt_dist = dist;
+        prop_msg.closest_pnt_angle = angle;
+        prop_msg.prop_coords.latitude = prop_lat;
+        prop_msg.prop_coords.longitude = prop_lon;
+        prop_msg.prop_coords.altitude = prop_alt;
+        prop_pub_.publish(prop_msg);
     }
+
+    ros::NodeHandle nh_;
+    ros::Subscriber gps_sub_;
+    ros::Subscriber prop_sub_;
+    ros::Publisher prop_pub_;
+    float robot_lat_;
+    float robot_lon_;
+    float robot_alt_;
 };
+
 int main(int argc, char** argv) {
     ros::init(argc, argv, "prop_locator");
     PropLocator prop_locator;
