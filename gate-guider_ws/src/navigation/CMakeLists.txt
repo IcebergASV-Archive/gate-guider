@@ -57,6 +57,7 @@ add_message_files(
   FILES
   Prop.msg
   SimpleGPS.msg
+  yolo.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -231,3 +232,11 @@ add_dependencies(coord_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPOR
 add_executable(fake_robot_coords src/fake_robot_coords.cpp)
 target_link_libraries(fake_robot_coords ${catkin_LIBRARIES})
 add_dependencies(fake_robot_coords ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(fake_yolo_boxes src/fake_yolo_boxes.cpp)
+target_link_libraries(fake_yolo_boxes ${catkin_LIBRARIES})
+add_dependencies(fake_yolo_boxes ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(angle_finder src/angle_finder.cpp)
+target_link_libraries(angle_finder ${catkin_LIBRARIES})
+add_dependencies(angle_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
