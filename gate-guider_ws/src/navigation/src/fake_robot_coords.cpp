@@ -1,15 +1,14 @@
 #include <ros/ros.h>
-#include <navigation/Prop.h>
+#include <navigation/SimpleGPS.h> //temporary
 
-
-void angle_range_finder() {
+void fake_robot_coords() {
     ros::NodeHandle nh;
-    ros::Publisher pub = nh.advertise<navigation::Prop>("prop_angle_range", 1);
+    ros::Publisher pub = nh.advertise<navigation::SimpleGPS>("/rectbot_coords", 10);
     ros::Rate rate(10);
-    navigation::Prop msg;
-    msg.prop_type = "red_marker";
-    msg.theta_1 = 1.6057;
-    msg.theta_2 = 2.7925;
+    navigation::SimpleGPS msg;
+    msg.latitude = 37.7749; // Example latitude value
+    msg.longitude = -122.4194; // Example longitude value
+    msg.altitude = 50.0; // Example altitude value
 
     while (ros::ok()) {
         ROS_INFO_STREAM(msg);
@@ -17,11 +16,10 @@ void angle_range_finder() {
         rate.sleep();
     }
 }
-
 int main(int argc, char** argv) {
     ros::init(argc, argv, "angle_range_finder_node");
     try {
-        angle_range_finder();
+        fake_robot_coords();
     }
     catch (ros::Exception& e) {
         ROS_ERROR_STREAM("An exception occurred in the angle_range_finder_node: " << e.what());

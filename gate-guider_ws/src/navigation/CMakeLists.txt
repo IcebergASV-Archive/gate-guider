@@ -11,8 +11,11 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
+  geographic_msgs
   message_generation
   sensor_msgs
+  mavros_msgs
 )
 
 
@@ -53,6 +56,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Prop.msg
+  SimpleGPS.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -73,6 +77,10 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
+  geographic_msgs
+  mavros_msgs
+  sensor_msgs
 )
 
 ################################################
@@ -215,3 +223,11 @@ add_dependencies(fake_bbox_angles ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_E
 add_executable(distance_finder src/distance_finder.cpp)
 target_link_libraries(distance_finder ${catkin_LIBRARIES})
 add_dependencies(distance_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(coord_finder src/coord_finder.cpp)
+target_link_libraries(coord_finder ${catkin_LIBRARIES})
+add_dependencies(coord_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(fake_robot_coords src/fake_robot_coords.cpp)
+target_link_libraries(fake_robot_coords ${catkin_LIBRARIES})
+add_dependencies(fake_robot_coords ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
