@@ -26,6 +26,8 @@ Preconditions
 Post Conditions
 - The GPS coordinate for the mid-point between the red and green marker has been identified.
 
+Prop Finder is inside the navigation package. It is launched with prop_finder.launch and contains 3 nodes: angle_finder, distance_finder, and coord_finder. It also includes node for publishing fake sensor data for testing. 
+
 ### Object Detection
 
 We are using YOLOv5 for object detection. We are creating a custom dataset with CVAT to train our model by following [this](https://www.youtube.com/watch?v=OMgQ2JzOAWA) YouTube tutorial. Training data was taken from the [RoboBoat website](https://roboboat.org) and past RoboBoat competition YouTube videos. 
