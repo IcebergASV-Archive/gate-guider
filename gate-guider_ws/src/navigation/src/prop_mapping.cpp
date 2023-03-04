@@ -29,16 +29,20 @@ private:
         prop.prop_coords.latitude = msg->prop_coords.latitude;
         prop.prop_coords.latitude = msg->prop_coords.longitude;
         prop.prop_coords.altitude = msg->prop_coords.altitude;
-        prop.prop_coord_range.latitude = msg->prop_coord_range.latitude;
-        prop.prop_coord_range.latitude = msg->prop_coord_range.longitude;
-        prop.prop_coord_range.altitude = msg->prop_coord_range.altitude;
+        prop.prop_coord_range.min_latitude = msg->prop_coord_range.min_latitude;
+        prop.prop_coord_range.max_latitude = msg->prop_coord_range.max_latitude;
+        prop.prop_coord_range.min_longitude = msg->prop_coord_range.min_longitude;
+        prop.prop_coord_range.max_longitude = msg->prop_coord_range.max_longitude;
+        prop.prop_coord_range.min_altitude = msg->prop_coord_range.min_altitude;
+        prop.prop_coord_range.max_altitude = msg->prop_coord_range.max_altitude;
+
 
 
         //make sure prop is not already in array
             
         if (isPropInArray(prop) == false){
             // add prop to array
-            prop_array.props.pushback(prop);
+            prop_array.props.push_back(prop);
         }
 
 
@@ -51,9 +55,9 @@ private:
     ros::Publisher prop_pub_;
     navigation::PropArray prop_array;
 
-    bool isPropInArray(Prop prop){
-        for (int i = 0, i < len(prop_array); i++) {
-            navigation::Prop checkprop = prop_array[i]
+    bool isPropInArray(navigation::Prop prop){
+        for (int i = 0; i < sizeof(prop_array); i++) {
+            navigation::Prop checkprop = prop_array[i];
             
             if ( prop.prop_coords.latitude >= checkprop.prop_coord_range.latitude_max && prop.prop_coords.latitude <= checkprop.prop_coord_range.latitude_min
             && prop.prop_coords.longitude >= checkprop.prop_coord_range.longitude_max && prop.prop_coords.longitude <= checkprop.prop_coord_range.longitude_min) {

@@ -44,13 +44,16 @@ private:
         // Create and publish the Prop message with the prop coordinates
         navigation::Prop prop_msg;
         prop_msg.prop_type = msg->prop_type;
-        prop_msg.theta_1 = msg->theta_1;
-        prop_msg.theta_2 = msg->theta_2;
-        prop_msg.closest_pnt_dist = dist;
-        prop_msg.closest_pnt_angle = angle;
+
         prop_msg.prop_coords.latitude = prop_lat;
         prop_msg.prop_coords.longitude = prop_lon;
         prop_msg.prop_coords.altitude = prop_alt;
+
+        prop_msg.prop_coord_range.min_latitude = prop_lat - lat_safety_range;
+        prop_msg.prop_coord_range.max_latitude = prop_lat + lat_safety_range;
+        prop_msg.prop_coord_range.min_longitude = prop_lon - lon_safety_range;
+        prop_msg.prop_coord_range.max_longitude = prop_lon + lon_safety_range;
+
         prop_pub_.publish(prop_msg);
     }
 
@@ -61,6 +64,8 @@ private:
     float robot_lat_;
     float robot_lon_;
     float robot_alt_;
+    float const lat_safety_range = 0.001;
+    float const lon_safety_range = 0.001;
 };
 
 int main(int argc, char** argv) {
