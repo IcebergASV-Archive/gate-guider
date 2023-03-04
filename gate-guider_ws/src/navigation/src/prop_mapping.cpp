@@ -34,19 +34,15 @@ private:
         prop.prop_coord_range.altitude = msg->prop_coord_range.altitude;
 
 
-        //check if prop is not already in array
-        for (int i = 0, i < len(prop_array); i++) {
-            navigation::Prop checkprop = prop_array[i]
-            if (prop_array[i] cout << i << " = " << cars[i] << "\n";
+        //make sure prop is not already in array
+            
+        if (isPropInArray(prop) == false){
+            // add prop to array
+            prop_array.props.pushback(prop);
         }
-        //pushback prop into array
-        prop_array.props.pushback(prop);
 
-        //publish array
-        
-        
-        // Create and publish the Prop message with the prop coordinates
-       
+
+        //publish array       
         prop_pub_.publish(prop_array);
     }
 
@@ -55,8 +51,20 @@ private:
     ros::Publisher prop_pub_;
     navigation::PropArray prop_array;
 
-    void propChecker(){
-        
+    bool isPropInArray(Prop prop){
+        for (int i = 0, i < len(prop_array); i++) {
+            navigation::Prop checkprop = prop_array[i]
+            
+            if ( prop.prop_coords.latitude >= checkprop.prop_coord_range.latitude_max && prop.prop_coords.latitude <= checkprop.prop_coord_range.latitude_min
+            && prop.prop_coords.longitude >= checkprop.prop_coord_range.longitude_max && prop.prop_coords.longitude <= checkprop.prop_coord_range.longitude_min) {
+                //prop is already in array, don't add it to the array
+                return true;
+            }
+
+            //prop is not in the array
+            return false;
+
+        }
     }
 
 };
