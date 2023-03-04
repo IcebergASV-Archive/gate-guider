@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 //#include <sensor_msgs/NavSatFix.h> temporary
+#include <navigation/PropInProgress.h>
 #include <navigation/Prop.h>
 #include <navigation/SimpleGPS.h> //temporary
 #include <geographic_msgs/GeoPoint.h>
@@ -31,7 +32,7 @@ private:
         robot_alt_ = msg->altitude;
     }
 
-    void propCallback(const navigation::Prop::ConstPtr& msg)
+    void propCallback(const navigation::PropInProgress::ConstPtr& msg)
     {
         // Calculate the GPS coordinates of the prop
         float dist = msg->closest_pnt_dist;
