@@ -11,7 +11,11 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
+  geographic_msgs
   message_generation
+  sensor_msgs
+  mavros_msgs
 )
 
 
@@ -52,6 +56,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Prop.msg
+  SimpleGPS.msg
+  yolo.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -72,6 +78,10 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
+  geographic_msgs
+  mavros_msgs
+  sensor_msgs
 )
 
 ################################################
@@ -206,3 +216,27 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(fake_bbox_angles_node src/fake_bbox_angles.cpp)
+target_link_libraries(fake_bbox_angles_node ${catkin_LIBRARIES})
+add_dependencies(fake_bbox_angles_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(distance_finder_node src/distance_finder.cpp)
+target_link_libraries(distance_finder_node ${catkin_LIBRARIES})
+add_dependencies(distance_finder_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(coord_finder_node src/coord_finder.cpp)
+target_link_libraries(coord_finder_node ${catkin_LIBRARIES})
+add_dependencies(coord_finder_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(fake_robot_coords_node src/fake_robot_coords.cpp)
+target_link_libraries(fake_robot_coords_node ${catkin_LIBRARIES})
+add_dependencies(fake_robot_coords_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(fake_yolo_boxes_node src/fake_yolo_boxes.cpp)
+target_link_libraries(fake_yolo_boxes_node ${catkin_LIBRARIES})
+add_dependencies(fake_yolo_boxes_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(angle_finder_node src/angle_finder.cpp)
+target_link_libraries(angle_finder_node ${catkin_LIBRARIES})
+add_dependencies(angle_finder_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
