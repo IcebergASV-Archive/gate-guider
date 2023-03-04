@@ -20,7 +20,7 @@ void fake_yolo_boxes() {
     }
 }
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "fake_yolo");
+    ros::init(argc, argv, "fake_yolo_boxes_node");
     try {
         fake_yolo_boxes();
     }

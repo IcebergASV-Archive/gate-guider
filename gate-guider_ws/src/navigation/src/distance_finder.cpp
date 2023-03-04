@@ -1,10 +1,11 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <navigation/Prop.h>
+#include <cmath>
 
-class LaserScanner {
+class DistanceFinder {
 public:
-    LaserScanner() : nh_(""), private_nh_("~") {
+    DistanceFinder() : nh_(""), private_nh_("~") {
         // get ROS parameters
         private_nh_.param<std::string>("prop_topic", prop_topic_, "/prop_angle_range");
         private_nh_.param<std::string>("scan_topic", scan_topic_, "/rect_bot/laser/scan");
@@ -12,9 +13,8 @@ public:
         private_nh_.param<double>("laser_angle_min", laser_angle_min, -M_PI/2.0);
         private_nh_.param<double>("laser_angle_max", laser_angle_max, M_PI/2.0);
 
-        // set up publishers and subscribers
-        sub_scan_ = nh_.subscribe(scan_topic_, 1, &LaserScanner::scanCallback, this);
-        sub_prop_ = nh_.subscribe(prop_topic_, 1, &LaserScanner::propCallback, this);
+        sub_scan_ = nh_.subscribe(scan_topic_, 1, &DistanceFinder::scanCallback, this);
+        sub_prop_ = nh_.subscribe(prop_topic_, 1, &DistanceFinder::propCallback, this);
         pub_prop_closest_ = nh_.advertise<navigation::Prop>("/prop_closest_point", 1);
     }
 
@@ -61,8 +61,8 @@ private:
 
         // calculate the range indexes for the given theta angles
         float steps = (laser_angle_max * 2) / laser_angle_increment; 
-        int index1 = (int)(((prop_msg_.theta_1 + (laser_angle_max - 1.570796327)) / (laser_angle_max*2))* steps);
-        int index2 = (int)(((prop_msg_.theta_2 + (laser_angle_max - 1.570796327)) / (laser_angle_max*2))* steps);
+        int index1 = (int)(((prop_msg_.theta_1 + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
+        int index2 = (int)(((prop_msg_.theta_2 + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
 
         // check that the range indexes are within the range of the scan message
         if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size()) {
@@ -77,7 +77,7 @@ private:
         int closest_angle_index = 0;
         for (i = index1; i <= index2; ++i) {
             if (std::isnan(scan_msg.ranges[i])) {
-                continue; //
+                continue; 
             }
             if(scan_msg.ranges[i] < closest_pnt){
                 closest_pnt = scan_msg.ranges[i];
@@ -101,8 +101,8 @@ private:
     }
 };
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "laser_scanner");
-    LaserScanner laser_scanner;
-    laser_scanner.spin();
+    ros::init(argc, argv, "distance_finder_node");
+    DistanceFinder distance_finder;
+    distance_finder.spin();
     return 0;
 }

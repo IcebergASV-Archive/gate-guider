@@ -17,7 +17,7 @@ void fake_robot_coords() {
     }
 }
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "fake_robot_coords");
+    ros::init(argc, argv, "fake_robot_coords_node");
     try {
         fake_robot_coords();
     }

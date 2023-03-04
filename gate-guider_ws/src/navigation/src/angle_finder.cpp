@@ -1,16 +1,15 @@
 #include <ros/ros.h>
 #include <navigation/yolo.h>
 #include <navigation/Prop.h>
+#include <cmath>
 
 
 class AngleFinder {
 public:
     AngleFinder()
     {
-        // Set up subscribers and publishers
         yolo_sub_ = nh_.subscribe("/yolo", 1, &AngleFinder::yoloCallback, this);
         prop_pub_ = nh_.advertise<navigation::Prop>("/prop_angles", 1);
-        
     }
 
     void spin() {
@@ -22,7 +21,7 @@ public:
     }
 
 private:
-    // Callback for the /global_position/global topic
+
     void yoloCallback(const navigation::yolo::ConstPtr& msg)
     {
         //get the position of the bounding box
@@ -47,13 +46,12 @@ private:
     float x_min;
     float x_max;
     float const realsense_fov = 1.204277184; //radians - 69 degrees
-    float const fov_end = 1.570796327 + (realsense_fov / 2 );
+    float const fov_end = (M_PI / 2) + (realsense_fov / 2 );
     int const realsense_res_x = 1920;
-    int const realsense_res_y = 1080;
 };
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "angle_finder");
+    ros::init(argc, argv, "angle_finder_node");
     AngleFinder angle_finder;
     angle_finder.spin();
     return 0;

@@ -2,7 +2,7 @@
 #include <navigation/Prop.h>
 
 
-void angle_range_finder() {
+void fake_bbox_angles() {
     ros::NodeHandle nh;
     ros::Publisher pub = nh.advertise<navigation::Prop>("prop_angle_range", 1);
     ros::Rate rate(10);
@@ -19,12 +19,12 @@ void angle_range_finder() {
 }
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "angle_range_finder_node");
+    ros::init(argc, argv, "fake_bbox_angles_node");
     try {
-        angle_range_finder();
+        fake_bbox_angles();
     }
     catch (ros::Exception& e) {
-        ROS_ERROR_STREAM("An exception occurred in the angle_range_finder_node: " << e.what());
+        ROS_ERROR_STREAM("An exception occurred in the fake_bbox_angles_node: " << e.what());
     }
     return 0;
 }

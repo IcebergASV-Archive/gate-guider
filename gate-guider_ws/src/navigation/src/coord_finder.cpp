@@ -3,15 +3,14 @@
 #include <navigation/Prop.h>
 #include <navigation/SimpleGPS.h> //temporary
 #include <geographic_msgs/GeoPoint.h>
-#include <cmath> // added for M_PI
+//#include <cmath> 
 
-class PropLocator {
+class CoordFinder {
 public:
-    PropLocator()
+    CoordFinder()
     {
-        // Set up subscribers and publishers
-        gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &PropLocator::gpsCallback, this);
-        prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &PropLocator::propCallback, this);
+        gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &CoordFinder::gpsCallback, this);
+        prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &CoordFinder::propCallback, this);
         prop_pub_ = nh_.advertise<navigation::Prop>("/prop_coordinates", 1);
         
     }
@@ -25,7 +24,6 @@ public:
     }
 
 private:
-    // Callback for the /global_position/global topic
     void gpsCallback(const navigation::SimpleGPS::ConstPtr& msg)
     {
         robot_lat_ = msg->latitude;
@@ -33,7 +31,6 @@ private:
         robot_alt_ = msg->altitude;
     }
 
-    // Callback for the /prop_closest_point topic
     void propCallback(const navigation::Prop::ConstPtr& msg)
     {
         // Calculate the GPS coordinates of the prop
@@ -66,8 +63,8 @@ private:
 };
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "prop_locator");
-    PropLocator prop_locator;
-    prop_locator.spin();
+    ros::init(argc, argv, "coord_finder_node");
+    CoordFinder coord_finder;
+    coord_finder.spin();
     return 0;
 }
