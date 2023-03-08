@@ -23,6 +23,7 @@ private:
 
     void propCallback(const navigation::Prop::ConstPtr& msg)
     {
+        //ROS_INFO_STREAM("Received a prop");
         // get prop info in variables
         navigation::Prop prop;
         prop.prop_type = msg->prop_type;
@@ -43,6 +44,7 @@ private:
         if (isPropInArray(prop) == false){
             // add prop to array
             prop_array.props.push_back(prop);
+            //ROS_INFO_STREAM("Prop is not in the array, adding it");
         }
 
 
@@ -56,19 +58,22 @@ private:
     navigation::PropArray prop_array;
 
     bool isPropInArray(navigation::Prop prop){
-        for (int i = 0; i < sizeof(prop_array); i++) {
-            navigation::Prop checkprop = prop_array[i];
+        for (int i = 0; i < prop_array.props.size(); i++) {
+            navigation::Prop checkprop = prop_array.props[i];
             
-            if ( prop.prop_coords.latitude >= checkprop.prop_coord_range.latitude_max && prop.prop_coords.latitude <= checkprop.prop_coord_range.latitude_min
-            && prop.prop_coords.longitude >= checkprop.prop_coord_range.longitude_max && prop.prop_coords.longitude <= checkprop.prop_coord_range.longitude_min) {
+            if ( prop.prop_coords.latitude >= checkprop.prop_coord_range.max_latitude && prop.prop_coords.latitude <= checkprop.prop_coord_range.min_latitude
+            && prop.prop_coords.longitude >= checkprop.prop_coord_range.max_longitude && prop.prop_coords.longitude <= checkprop.prop_coord_range.min_longitude) {
                 //prop is already in array, don't add it to the array
                 return true;
+                ROS_INFO_STREAM("Prop is already in the array");
             }
 
-            //prop is not in the array
-            return false;
-
+            
         }
+        //prop is not in the array
+        return false;
+        
+
     }
 
 };
