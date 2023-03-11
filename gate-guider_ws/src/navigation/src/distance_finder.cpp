@@ -66,12 +66,32 @@ private:
         int index1 = (int)(((prop_msg_.theta_1 + angle_safety_range + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
         int index2 = (int)(((prop_msg_.theta_2 - angle_safety_range + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
 
-        // check that the range indexes are within the range of the scan message
-        if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size()) {
+        // check that the range indexes are within the range of the scan message and that index1 > index2
+        if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size() || index1 <= index2) {
             ROS_WARN("PropInProgress message range indexes are out of bounds for the given scan message");
             return;
         }
 
+        //create a smaller vector of distances between the two indexes
+        points_vector = getSmallerVector(scan_msgs.ranges, index1, index2);
+        
+        #include <vector>
+#include <stdexcept>
+
+std::vector<int> getSmallerVector(const std::vector<int>& largerVector, int startIndex, int endIndex) {
+    if (startIndex > endIndex) {
+        throw std::invalid_argument("Start index cannot be greater than end index");
+    }
+
+    std::vector<int> smallerVector;
+
+    // Add the values from startIndex to endIndex (inclusive) to the smaller vector
+    for (int i = startIndex; i <= endIndex; i++) {
+        smallerVector.push_back(largerVector[i]);
+    }
+
+    return smallerVector;
+}
         // find the closest point and angle within the given range
 
         int i = 0;
