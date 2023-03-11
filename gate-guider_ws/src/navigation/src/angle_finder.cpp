@@ -29,14 +29,14 @@ private:
         x_max = msg->xmax;
 
         // Calculate the angle range for the prop
-        float theta1 = fov_end - ((x_max / realsense_res_x) * realsense_fov);
-        float theta2 = fov_end - ((x_min / realsense_res_x) * realsense_fov);
+        float theta_right = fov_end - ((x_max / realsense_res_x) * realsense_fov); 
+        float theta_left = fov_end - ((x_min / realsense_res_x) * realsense_fov);
         
         // Create and publish the Prop message with the prop coordinates
         navigation::PropInProgress prop_msg;
         prop_msg.prop_type = msg->label; //assign object classification label to the prop
-        prop_msg.theta_1 = theta1;
-        prop_msg.theta_2 = theta2;
+        prop_msg.theta_1 = theta_right;
+        prop_msg.theta_2 = theta_left;
         prop_pub_.publish(prop_msg);
     }
 

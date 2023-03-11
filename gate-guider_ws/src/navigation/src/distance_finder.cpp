@@ -2,6 +2,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <navigation/PropInProgress.h>
 #include <cmath>
+#include <vector>
 
 class DistanceFinder {
 public:
@@ -38,6 +39,7 @@ private:
     double laser_angle_min;
     double laser_angle_max;
     double laser_angle_increment;
+    float angle_safety_range = 0.0;
     navigation::PropInProgress prop_msg_;
     sensor_msgs::LaserScan scan_msg;
 
@@ -61,8 +63,8 @@ private:
 
         // calculate the range indexes for the given theta angles
         float steps = (laser_angle_max * 2) / laser_angle_increment; 
-        int index1 = (int)(((prop_msg_.theta_1 + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
-        int index2 = (int)(((prop_msg_.theta_2 + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
+        int index1 = (int)(((prop_msg_.theta_1 + angle_safety_range + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
+        int index2 = (int)(((prop_msg_.theta_2 - angle_safety_range + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
 
         // check that the range indexes are within the range of the scan message
         if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size()) {
@@ -99,6 +101,52 @@ private:
         closest_prop_msg.closest_pnt_angle = closest_angle;
         pub_prop_closest_.publish(closest_prop_msg);
     }
+
+    float calculateRadius(const std::vector<float>& distances, const std::vector<float>& angles) {
+        // Check that we have at least 6 points - changed to a param later
+        if (distances.size() < 6 || angles.size() < 6) {
+            throw std::runtime_error("At least 6 points are required to calculate the radius of a cylinder.");
+        }
+
+        // Convert angles to x,y coordinates on a unit circle
+        std::vector<float> x_coords(distances.size());
+        std::vector<float> y_coords(distances.size());
+        for (size_t i = 0; i < distances.size(); ++i) {
+            x_coords[i] = std::cos(angles[i]);
+            y_coords[i] = std::sin(angles[i]);
+        }
+
+        // Use linear regression to find the best-fit line for the x,y coordinates
+        float x_mean = 0.0f;
+        float y_mean = 0.0f;
+        for (size_t i = 0; i < distances.size(); ++i) {
+            x_mean += x_coords[i];
+            y_mean += y_coords[i];
+        }
+        x_mean /= distances.size();
+        y_mean /= distances.size();
+
+        float slope = 0.0f;
+        float intercept = 0.0f;
+        float numerator = 0.0f;
+        float denominator = 0.0f;
+        for (size_t i = 0; i < distances.size(); ++i) {
+            numerator += (x_coords[i] - x_mean) * (y_coords[i] - y_mean);
+            denominator += std::pow(x_coords[i] - x_mean, 2);
+        }
+        slope = numerator / denominator;
+        intercept = y_mean - slope * x_mean;
+
+        // Calculate the center of the best-fit circle for the x,y coordinates
+        float center_x = -slope / 2.0f;
+        float center_y = intercept - slope * center_x;
+
+        // Calculate the radius of the circle
+        float radius = std::sqrt(std::pow(center_x, 2) + std::pow(center_y, 2));
+
+        return radius;
+    }
+
 };
 int main(int argc, char** argv) {
     ros::init(argc, argv, "distance_finder_node");
