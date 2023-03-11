@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-#include <navigation/Prop.h>
+#include <navigation/PropInProgress.h>
 #include <cmath>
 
 class DistanceFinder {
@@ -15,7 +15,7 @@ public:
 
         sub_scan_ = nh_.subscribe(scan_topic_, 1, &DistanceFinder::scanCallback, this);
         sub_prop_ = nh_.subscribe(prop_topic_, 1, &DistanceFinder::propCallback, this);
-        pub_prop_closest_ = nh_.advertise<navigation::Prop>("/prop_closest_point", 1);
+        pub_prop_closest_ = nh_.advertise<navigation::PropInProgress>("/prop_closest_point", 1);
     }
 
     void spin() {
@@ -38,13 +38,13 @@ private:
     double laser_angle_min;
     double laser_angle_max;
     double laser_angle_increment;
-    navigation::Prop prop_msg_;
+    navigation::PropInProgress prop_msg_;
     sensor_msgs::LaserScan scan_msg;
 
-    void propCallback(const navigation::Prop::ConstPtr& msg) {
-        // save the Prop message for later use
+    void propCallback(const navigation::PropInProgress::ConstPtr& msg) {
+        // save the PropInProgress message for later use
         prop_msg_ = *msg;
-        ROS_INFO_STREAM("Received Prop message with theta_1=" << prop_msg_.theta_1
+        ROS_INFO_STREAM("Received PropInProgress message with theta_1=" << prop_msg_.theta_1
             << " and theta_2=" << prop_msg_.theta_2);
     }
 
@@ -53,9 +53,9 @@ private:
         scan_msg = *msg;
         laser_angle_increment = scan_msg.angle_increment;
 
-        // check if the Prop message is valid
+        // check if the PropInProgress message is valid
         if (prop_msg_.prop_type.empty() || std::isnan(prop_msg_.theta_1) || std::isnan(prop_msg_.theta_2)) {
-            ROS_WARN("Invalid Prop message received");
+            ROS_WARN("Invalid PropInProgress message received");
             return;
         }
 
@@ -66,7 +66,7 @@ private:
 
         // check that the range indexes are within the range of the scan message
         if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size()) {
-            ROS_WARN("Prop message range indexes are out of bounds for the given scan message");
+            ROS_WARN("PropInProgress message range indexes are out of bounds for the given scan message");
             return;
         }
 
@@ -87,11 +87,11 @@ private:
             }
         }
 
-        // convert index to angle
-        float closest_angle = ((closest_angle_index/steps)*(laser_angle_max*2)) - (laser_angle_max - 1.570796327);
+        // convert index to angle, how many degrees from 90.
+        float closest_angle = ((closest_angle_index/steps)*(laser_angle_max*2)) - (laser_angle_max);
 
 
-        navigation::Prop closest_prop_msg;
+        navigation::PropInProgress closest_prop_msg;
         closest_prop_msg.prop_type = prop_msg_.prop_type;
         closest_prop_msg.theta_1 = prop_msg_.theta_1;
         closest_prop_msg.theta_2 = prop_msg_.theta_2;

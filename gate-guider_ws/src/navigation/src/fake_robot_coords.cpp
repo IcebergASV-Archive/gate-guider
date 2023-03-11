@@ -6,8 +6,8 @@ void fake_robot_coords() {
     ros::Publisher pub = nh.advertise<navigation::SimpleGPS>("/rectbot_coords", 10);
     ros::Rate rate(10);
     navigation::SimpleGPS msg;
-    msg.latitude = 40.0; // Example latitude value
-    msg.longitude = -120; // Example longitude value
+    msg.latitude = 47.0; // Example latitude value
+    msg.longitude = 52.0; // Example longitude value
     msg.altitude = 50.0; // Example altitude value
 
     while (ros::ok()) {

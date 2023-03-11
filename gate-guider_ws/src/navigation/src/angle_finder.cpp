@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <navigation/yolo.h>
-#include <navigation/Prop.h>
+#include <navigation/PropInProgress.h>
 #include <cmath>
 
 
@@ -9,7 +9,7 @@ public:
     AngleFinder()
     {
         yolo_sub_ = nh_.subscribe("/yolo", 1, &AngleFinder::yoloCallback, this);
-        prop_pub_ = nh_.advertise<navigation::Prop>("/prop_angles", 1);
+        prop_pub_ = nh_.advertise<navigation::PropInProgress>("/prop_angles", 1);
     }
 
     void spin() {
@@ -33,7 +33,7 @@ private:
         float theta2 = fov_end - ((x_min / realsense_res_x) * realsense_fov);
         
         // Create and publish the Prop message with the prop coordinates
-        navigation::Prop prop_msg;
+        navigation::PropInProgress prop_msg;
         prop_msg.prop_type = msg->label; //assign object classification label to the prop
         prop_msg.theta_1 = theta1;
         prop_msg.theta_2 = theta2;

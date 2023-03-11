@@ -1,17 +1,22 @@
 #include <ros/ros.h>
-//#include <sensor_msgs/NavSatFix.h> temporary
+#include <navigation/Compass.h> 
+#include <navigation/PropInProgress.h>
 #include <navigation/Prop.h>
 #include <navigation/SimpleGPS.h> //temporary
 #include <geographic_msgs/GeoPoint.h>
-//#include <cmath> 
+#include <cmath> 
 
 class CoordFinder {
 public:
     CoordFinder()
     {
         gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &CoordFinder::gpsCallback, this);
+        compass_sub_ = nh_.subscribe("/rectbot_heading", 1, &CoordFinder::compassCallback, this );
         prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &CoordFinder::propCallback, this);
-        prop_pub_ = nh_.advertise<navigation::Prop>("/prop_coordinates", 1);
+        prop_pub_ = nh_.advertise<navigation::Prop>("/completed_props", 1);
+        //nh_.getParam("safety_range", safety_range); not working right now
+        //nh_.getParam("degrees_lat_per_meter", degrees_lat_per_meter);
+        //nh_.getParam("degrees_lon_per_meter", degrees_lon_per_meter);
         
     }
 
@@ -31,35 +36,70 @@ private:
         robot_alt_ = msg->altitude;
     }
 
-    void propCallback(const navigation::Prop::ConstPtr& msg)
+    void compassCallback(const navigation::Compass::ConstPtr& msg)
     {
-        // Calculate the GPS coordinates of the prop
+        robot_heading = msg->heading;
+    }
+
+    void propCallback(const navigation::PropInProgress::ConstPtr& msg)
+    {
+        //// Calculate the GPS coordinates of the prop
         float dist = msg->closest_pnt_dist;
         float angle = msg->closest_pnt_angle;
-        float prop_lat = robot_lat_ + (dist * cos(angle)) / 111111.0; // 1 degree of latitude = 111111 meters
-        float prop_lon = robot_lon_ + (dist * sin(angle)) / (111111.0 * cos(robot_lat_));
-        float prop_alt = robot_alt_;
+        float prop_heading;
+        
+        if ((robot_heading - angle) > (2*M_PI))
+            prop_heading = robot_heading - angle - (2* M_PI);
+        else 
+            prop_heading = robot_heading - angle;
+
+        double north_dist = dist * cos(prop_heading);
+        double east_dist = dist * sin(prop_heading);
+
+        double lat_diff = north_dist * degrees_lat_per_meter;
+        double lon_diff = east_dist * degrees_lon_per_meter;
+
+        double prop_lat = robot_lat_ + lat_diff;
+        double prop_lon = robot_lon_ + lon_diff;
+        double prop_alt = robot_alt_;
+
+
+        double lat_safety_range = degrees_lat_per_meter * safety_range;
+        double lon_safety_range = degrees_lon_per_meter * safety_range;
+
         
         // Create and publish the Prop message with the prop coordinates
         navigation::Prop prop_msg;
         prop_msg.prop_type = msg->prop_type;
-        prop_msg.theta_1 = msg->theta_1;
-        prop_msg.theta_2 = msg->theta_2;
-        prop_msg.closest_pnt_dist = dist;
-        prop_msg.closest_pnt_angle = angle;
+
         prop_msg.prop_coords.latitude = prop_lat;
         prop_msg.prop_coords.longitude = prop_lon;
         prop_msg.prop_coords.altitude = prop_alt;
+
+        prop_msg.prop_coord_range.min_latitude = prop_lat - lat_safety_range;
+        prop_msg.prop_coord_range.max_latitude = prop_lat + lat_safety_range;
+        prop_msg.prop_coord_range.min_longitude = prop_lon - lon_safety_range;
+        prop_msg.prop_coord_range.max_longitude = prop_lon + lon_safety_range;
+
         prop_pub_.publish(prop_msg);
     }
 
     ros::NodeHandle nh_;
     ros::Subscriber gps_sub_;
     ros::Subscriber prop_sub_;
+    ros::Subscriber compass_sub_;
     ros::Publisher prop_pub_;
     float robot_lat_;
     float robot_lon_;
     float robot_alt_;
+    float robot_heading;
+    float safety_range = 0.1;
+    float degrees_lat_per_meter = 8.9942910391e-06;
+    float degrees_lon_per_meter = 1.32865719904e-05;
+
+
+
+
 };
 
 int main(int argc, char** argv) {

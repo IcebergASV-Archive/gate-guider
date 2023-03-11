@@ -1,12 +1,12 @@
 #include <ros/ros.h>
-#include <navigation/Prop.h>
+#include <navigation/PropInProgress.h>
 
 
 void fake_bbox_angles() {
     ros::NodeHandle nh;
-    ros::Publisher pub = nh.advertise<navigation::Prop>("prop_angle_range", 1);
+    ros::Publisher pub = nh.advertise<navigation::PropInProgress>("prop_angle_range", 1);
     ros::Rate rate(10);
-    navigation::Prop msg;
+    navigation::PropInProgress msg;
     msg.prop_type = "red_marker";
     msg.theta_1 = 1.6057;
     msg.theta_2 = 2.7925;

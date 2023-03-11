@@ -55,9 +55,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
+  GeoPointRange.msg
   Prop.msg
+  PropArray.msg
+  PropInProgress.msg
   SimpleGPS.msg
   yolo.msg
+  Compass.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -240,3 +244,11 @@ add_dependencies(fake_yolo_boxes_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAM
 add_executable(angle_finder_node src/angle_finder.cpp)
 target_link_libraries(angle_finder_node ${catkin_LIBRARIES})
 add_dependencies(angle_finder_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(prop_mapping_node src/prop_mapping.cpp)
+target_link_libraries(prop_mapping_node ${catkin_LIBRARIES})
+add_dependencies(prop_mapping_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(fake_compass_headings_node src/fake_compass_headings.cpp)
+target_link_libraries(fake_compass_headings_node ${catkin_LIBRARIES})
+add_dependencies(fake_compass_headings_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})

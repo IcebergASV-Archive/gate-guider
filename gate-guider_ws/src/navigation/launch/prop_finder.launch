@@ -15,6 +15,11 @@
     <!-- Add any necessary arguments here -->
   </node>
 
+  <!-- Start fake_compass_headings node -->
+  <node name="fake_compass_headings" pkg="navigation" type="fake_compass_headings_node" output="screen">
+    <!-- Add any necessary arguments here -->
+  </node>
+
   <!-- Start angle_finder node -->
   <node name="angle_finder" pkg="navigation" type="angle_finder_node" output="screen">
     <!-- Add any necessary arguments here -->
@@ -25,8 +30,17 @@
     <!-- Add any necessary arguments here -->
   </node>
 
+
   <!-- Start coord_finder node -->
   <node name="coord_finder" pkg="navigation" type="coord_finder_node" output="screen">
+    <!--param name = "degrees_lat_per_meter" value="6.2"/>
+    <param name = "degrees_lon_per_meter" value="5.2"/>
+    <param name = "safety_range_meters" value="0.1"/-->
+
+  </node>
+
+   <!-- Start prop_mapping node -->
+  <node name="prop_mapping" pkg="navigation" type="prop_mapping_node" output="screen">
     <!-- Add any necessary arguments here -->
   </node>
 </launch>
