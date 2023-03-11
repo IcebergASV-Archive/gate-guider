@@ -6,7 +6,7 @@ void fake_compass_headings() {
     ros::Publisher pub = nh.advertise<navigation::Compass>("/rectbot_heading", 10);
     ros::Rate rate(10);
     navigation::Compass msg;
-    msg.heading = 300;
+    msg.heading = 5.235987756;
 
     while (ros::ok()) {
         ROS_INFO_STREAM(msg);
