@@ -16,8 +16,9 @@ This repo will contain a ROS package and depancies to detect markers for the Pan
 
 
 ## Prop Finder
+<img width="1080" alt="Gate guider" src="https://user-images.githubusercontent.com/90921913/224487522-f02f051b-89df-42b9-a422-ade978841928.png">
 
-![Gate guider (4)](https://user-images.githubusercontent.com/90921913/218108712-39d3538a-af41-429b-a17b-d92df176a49f.png) 
+
 
 Preconditions
 - ASV is more than 6 ft away from the markers, but close enough to classify and identify distance.
@@ -33,14 +34,8 @@ Prop Finder is inside the navigation package. It is launched with prop_finder.la
 We are using YOLOv5 for object detection. We are creating a custom dataset with CVAT to train our model by following [this](https://www.youtube.com/watch?v=OMgQ2JzOAWA) YouTube tutorial. Training data was taken from the [RoboBoat website](https://roboboat.org) and past RoboBoat competition YouTube videos. 
 
 We trained our model to recognize the following objects:
-- black buoy
-- red buoy 
-- green buoy
-- blue buoy
-- yellow buoy
-- white marker
-- red marker
-- green marker
+- marker
+- buoy
 
 ## Design Considerations and Notes
 
