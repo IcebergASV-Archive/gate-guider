@@ -1,16 +1,17 @@
 #include <ros/ros.h>
-//#include <sensor_msgs/NavSatFix.h> temporary
+#include <navigation/Compass.h> 
 #include <navigation/PropInProgress.h>
 #include <navigation/Prop.h>
 #include <navigation/SimpleGPS.h> //temporary
 #include <geographic_msgs/GeoPoint.h>
-//#include <cmath> 
+#include <cmath> 
 
 class CoordFinder {
 public:
     CoordFinder()
     {
         gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &CoordFinder::gpsCallback, this);
+        compass_sub_ = nh_.subscribe("/rectbot_heading", 1, &CoordFinder::compassCallback, this );
         prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &CoordFinder::propCallback, this);
         prop_pub_ = nh_.advertise<navigation::Prop>("/prop_coordinates", 1);
         
@@ -32,13 +33,30 @@ private:
         robot_alt_ = msg->altitude;
     }
 
+    void compassCallback(const navigation::Compass::ConstPtr& msg)
+    {
+        robot_heading = msg->heading;
+    }
+
     void propCallback(const navigation::PropInProgress::ConstPtr& msg)
     {
         // Calculate the GPS coordinates of the prop
         float dist = msg->closest_pnt_dist;
         float angle = msg->closest_pnt_angle;
-        float prop_lat = robot_lat_ + (dist * cos(angle)) / 111111.0; // 1 degree of latitude = 111111 meters
-        float prop_lon = robot_lon_ + (dist * sin(angle)) / (111111.0 * cos(robot_lat_));
+        float prop_heading = robot_heading - angle;
+        if ((robot_heading - angle) > (2*M_PI))
+            prop_heading = robot_heading - angle - (2* M_PI);
+        else 
+            prop_heading = robot_heading - angle;
+
+        float north_dist = dist * cos(prop_heading);
+        float east_dist = dist * sin(prop_heading);
+
+        float lat_diff = north_dist * degrees_lat_per_meter
+        float lon_diff = east_dist * degrees_lon_per_meter
+
+        float prop_lat = robot_lat_ + lat_diff;
+        float prop_lon = robot_lon_ + lon_diff;
         float prop_alt = robot_alt_;
         
         // Create and publish the Prop message with the prop coordinates
@@ -60,12 +78,15 @@ private:
     ros::NodeHandle nh_;
     ros::Subscriber gps_sub_;
     ros::Subscriber prop_sub_;
+    ros::Subscriber compass_sub_;
     ros::Publisher prop_pub_;
     float robot_lat_;
     float robot_lon_;
     float robot_alt_;
-    float const lat_safety_range = 0.001;
-    float const lon_safety_range = 0.001;
+    int robot_heading;
+    float const lat_safety_range = 0.00000089942910391;//10 cm 
+    float const lon_safety_range = 0.00000132865719904; // 10 cm
+
 };
 
 int main(int argc, char** argv) {

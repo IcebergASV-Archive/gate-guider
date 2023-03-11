@@ -27,6 +27,7 @@
 
   <!-- Start coord_finder node -->
   <node name="coord_finder" pkg="navigation" type="coord_finder_node" output="screen">
-    <!-- Add any necessary arguments here -->
+    <param name = "degrees_lat_per_meter" value="8.9942910391e-06">
+    <param name = "degrees_lon_per_meter" value="1.32865719904e-05">
   </node>
 </launch>

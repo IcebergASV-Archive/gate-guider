@@ -87,8 +87,8 @@ private:
             }
         }
 
-        // convert index to angle
-        float closest_angle = ((closest_angle_index/steps)*(laser_angle_max*2)) - (laser_angle_max - 1.570796327);
+        // convert index to angle, how many degrees from 90.
+        float closest_angle = ((closest_angle_index/steps)*(laser_angle_max*2)) - (laser_angle_max);
 
 
         navigation::PropInProgress closest_prop_msg;
