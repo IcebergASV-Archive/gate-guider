@@ -6,7 +6,7 @@ class PropMapping {
 public:
     PropMapping()
     {
-        prop_sub_ = nh_.subscribe("/prop_coordinates", 1, &PropMapping::propCallback, this);
+        prop_sub_ = nh_.subscribe("/completed_props", 1, &PropMapping::propCallback, this);
         prop_pub_ = nh_.advertise<navigation::PropArray>("/prop_array", 1);
         
     }
@@ -28,7 +28,7 @@ private:
         navigation::Prop prop;
         prop.prop_type = msg->prop_type;
         prop.prop_coords.latitude = msg->prop_coords.latitude;
-        prop.prop_coords.latitude = msg->prop_coords.longitude;
+        prop.prop_coords.longitude = msg->prop_coords.longitude;
         prop.prop_coords.altitude = msg->prop_coords.altitude;
         prop.prop_coord_range.min_latitude = msg->prop_coord_range.min_latitude;
         prop.prop_coord_range.max_latitude = msg->prop_coord_range.max_latitude;
@@ -44,7 +44,7 @@ private:
         if (isPropInArray(prop) == false){
             // add prop to array
             prop_array.props.push_back(prop);
-            //ROS_INFO_STREAM("Prop is not in the array, adding it");
+            ROS_INFO_STREAM("Prop is not in the array, adding it");
         }
 
 
@@ -61,8 +61,8 @@ private:
         for (int i = 0; i < prop_array.props.size(); i++) {
             navigation::Prop checkprop = prop_array.props[i];
             
-            if ( prop.prop_coords.latitude >= checkprop.prop_coord_range.max_latitude && prop.prop_coords.latitude <= checkprop.prop_coord_range.min_latitude
-            && prop.prop_coords.longitude >= checkprop.prop_coord_range.max_longitude && prop.prop_coords.longitude <= checkprop.prop_coord_range.min_longitude) {
+            if ( prop.prop_coords.latitude <= checkprop.prop_coord_range.max_latitude && prop.prop_coords.latitude >= checkprop.prop_coord_range.min_latitude
+            && prop.prop_coords.longitude <= checkprop.prop_coord_range.max_longitude && prop.prop_coords.longitude >= checkprop.prop_coord_range.min_longitude) {
                 //prop is already in array, don't add it to the array
                 return true;
                 ROS_INFO_STREAM("Prop is already in the array");

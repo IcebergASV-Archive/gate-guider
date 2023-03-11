@@ -14,9 +14,9 @@ public:
         compass_sub_ = nh_.subscribe("/rectbot_heading", 1, &CoordFinder::compassCallback, this );
         prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &CoordFinder::propCallback, this);
         prop_pub_ = nh_.advertise<navigation::Prop>("/completed_props", 1);
-        nh_.getParam("/coord_finder_node/safety_range", safety_range);
-        nh_.getParam("/coord_finder_node/degrees_lat_per_meter", degrees_lat_per_meter);
-        nh_.getParam("/coord_finder_node/degrees_lon_per_meter", degrees_lon_per_meter);
+        //nh_.getParam("safety_range", safety_range); not working right now
+        //nh_.getParam("degrees_lat_per_meter", degrees_lat_per_meter);
+        //nh_.getParam("degrees_lon_per_meter", degrees_lon_per_meter);
         
     }
 
@@ -43,9 +43,9 @@ private:
 
     void propCallback(const navigation::PropInProgress::ConstPtr& msg)
     {
-        ROS_INFO_STREAM("degrees_lat_per_m: " << degrees_lat_per_meter);
-        ROS_INFO_STREAM("degrees_lon_per_m: " << degrees_lon_per_meter);
-        // Calculate the GPS coordinates of the prop
+        //ROS_INFO_STREAM("degrees_lat_per_m: " << degrees_lat_per_meter);
+        //ROS_INFO_STREAM("degrees_lon_per_m: " << degrees_lon_per_meter);
+        //// Calculate the GPS coordinates of the prop
         float dist = msg->closest_pnt_dist;
         float angle = msg->closest_pnt_angle;
         float prop_heading;
@@ -54,28 +54,33 @@ private:
             prop_heading = robot_heading - angle - (2* M_PI);
         else 
             prop_heading = robot_heading - angle;
-        ROS_INFO_STREAM("prop_heading: " << prop_heading);
-        float north_dist = dist * cos(prop_heading);
-        float east_dist = dist * sin(prop_heading);
-        ROS_INFO_STREAM("north_dist: " << north_dist);
-        ROS_INFO_STREAM("east_dist: " << east_dist);
-        float lat_diff = north_dist * degrees_lat_per_meter;
-        float lon_diff = east_dist * degrees_lon_per_meter;
-        ROS_INFO_STREAM("lat_diff: " << lat_diff);
-        ROS_INFO_STREAM("lon_diff: " << lon_diff);
-        float prop_lat = robot_lat_ + lat_diff;
-        float prop_lon = robot_lon_ + lon_diff;
-        float prop_alt = robot_alt_;
+        //ROS_INFO_STREAM("prop_heading: " << prop_heading);
+        double north_dist = dist * cos(prop_heading);
+        double east_dist = dist * sin(prop_heading);
+        //ROS_INFO_STREAM("north_dist: " << north_dist);
+        //ROS_INFO_STREAM("east_dist: " << east_dist);
+        double lat_diff = north_dist * degrees_lat_per_meter;
+        double lon_diff = east_dist * degrees_lon_per_meter;
+        //ROS_INFO_STREAM("lat_diff: " << lat_diff);
+        //ROS_INFO_STREAM("lon_diff: " << lon_diff);
+        double prop_lat = robot_lat_ + lat_diff;
+        double prop_lon = robot_lon_ + lon_diff;
+        double prop_alt = robot_alt_;
+        //ROS_INFO_STREAM("prop_lat: " << prop_lat);
+        //ROS_INFO_STREAM("prop_lon: " << prop_lon);
 
-        float lat_safety_range = degrees_lat_per_meter * safety_range;
-        float lon_safety_range = degrees_lon_per_meter * safety_range;
+        double lat_safety_range = degrees_lat_per_meter * safety_range;
+        double lon_safety_range = degrees_lon_per_meter * safety_range;
+
+       //ROS_INFO_STREAM("lat_safety_range: " << lat_safety_range);
+       // ROS_INFO_STREAM("lon_safety_range: " << lon_safety_range);
         
         // Create and publish the Prop message with the prop coordinates
         navigation::Prop prop_msg;
         prop_msg.prop_type = msg->prop_type;
 
-        prop_msg.prop_coords.latitude = lat_diff;
-        prop_msg.prop_coords.longitude = lon_diff;
+        prop_msg.prop_coords.latitude = prop_lat;
+        prop_msg.prop_coords.longitude = prop_lon;
         prop_msg.prop_coords.altitude = prop_alt;
 
         prop_msg.prop_coord_range.min_latitude = prop_lat - lat_safety_range;
@@ -95,9 +100,10 @@ private:
     float robot_lon_;
     float robot_alt_;
     float robot_heading;
-    float safety_range;
-    float degrees_lat_per_meter;
-    float degrees_lon_per_meter;
+    float safety_range = 0.1;
+    float degrees_lat_per_meter = 8.9942910391e-06;
+    float degrees_lon_per_meter = 1.32865719904e-05;
+
 
 
 
