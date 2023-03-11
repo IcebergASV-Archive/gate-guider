@@ -43,8 +43,6 @@ private:
 
     void propCallback(const navigation::PropInProgress::ConstPtr& msg)
     {
-        //ROS_INFO_STREAM("degrees_lat_per_m: " << degrees_lat_per_meter);
-        //ROS_INFO_STREAM("degrees_lon_per_m: " << degrees_lon_per_meter);
         //// Calculate the GPS coordinates of the prop
         float dist = msg->closest_pnt_dist;
         float angle = msg->closest_pnt_angle;
@@ -54,26 +52,21 @@ private:
             prop_heading = robot_heading - angle - (2* M_PI);
         else 
             prop_heading = robot_heading - angle;
-        //ROS_INFO_STREAM("prop_heading: " << prop_heading);
+
         double north_dist = dist * cos(prop_heading);
         double east_dist = dist * sin(prop_heading);
-        //ROS_INFO_STREAM("north_dist: " << north_dist);
-        //ROS_INFO_STREAM("east_dist: " << east_dist);
+
         double lat_diff = north_dist * degrees_lat_per_meter;
         double lon_diff = east_dist * degrees_lon_per_meter;
-        //ROS_INFO_STREAM("lat_diff: " << lat_diff);
-        //ROS_INFO_STREAM("lon_diff: " << lon_diff);
+
         double prop_lat = robot_lat_ + lat_diff;
         double prop_lon = robot_lon_ + lon_diff;
         double prop_alt = robot_alt_;
-        //ROS_INFO_STREAM("prop_lat: " << prop_lat);
-        //ROS_INFO_STREAM("prop_lon: " << prop_lon);
+
 
         double lat_safety_range = degrees_lat_per_meter * safety_range;
         double lon_safety_range = degrees_lon_per_meter * safety_range;
 
-       //ROS_INFO_STREAM("lat_safety_range: " << lat_safety_range);
-       // ROS_INFO_STREAM("lon_safety_range: " << lon_safety_range);
         
         // Create and publish the Prop message with the prop coordinates
         navigation::Prop prop_msg;

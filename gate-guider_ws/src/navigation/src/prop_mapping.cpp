@@ -23,8 +23,7 @@ private:
 
     void propCallback(const navigation::Prop::ConstPtr& msg)
     {
-        //ROS_INFO_STREAM("Received a prop");
-        // get prop info in variables
+        // get prop info
         navigation::Prop prop;
         prop.prop_type = msg->prop_type;
         prop.prop_coords.latitude = msg->prop_coords.latitude;
@@ -42,7 +41,7 @@ private:
         //make sure prop is not already in array
             
         if (isPropInArray(prop) == false){
-            // add prop to array
+            // add prop to array if not already there
             prop_array.props.push_back(prop);
             ROS_INFO_STREAM("Prop is not in the array, adding it");
         }
@@ -58,6 +57,7 @@ private:
     navigation::PropArray prop_array;
 
     bool isPropInArray(navigation::Prop prop){
+        //use safety ranges to decide if prop is already in array
         for (int i = 0; i < prop_array.props.size(); i++) {
             navigation::Prop checkprop = prop_array.props[i];
             
@@ -70,9 +70,7 @@ private:
 
             
         }
-        //prop is not in the array
-        return false;
-        
+        return false;       
 
     }
 
